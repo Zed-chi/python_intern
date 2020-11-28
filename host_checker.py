@@ -3,28 +3,26 @@ from urllib.parse import urlparse, urlunparse
 import requests
 
 
-def is_alive_host(hostname):
+def is_alive_host(hostname=None, response=None):
     """Проверить, что запрашиваемый хост возвращает http status 100<=x<400."""
-    try:
-        response = requests.head(hostname)
-        status = response.status_code
-        print(f"{hostname} {status}")
-        return status < 400 and status > 100
-    except Exception as e:
-        return False
+    if hostname:
+        response = requests.head(hostname, allow_redirects=False)
+    status = response.status_code
+    print(f"{hostname} {status}")
+    return status < 400 and status >= 100
 
 
 def get_host():
-    parser = argparse.ArgumentParser(description='Host checker')
+    parser = argparse.ArgumentParser(description="Host checker")
     parser.add_argument(dest="host", help="url to check")
     args = parser.parse_args()
     return args.host
 
 
-def check_and_correct_host(host):    
+def check_and_correct_host(host):
     parsed_url = urlparse(host)
-    if not parsed_url.scheme:        
-        return urlunparse(['https', host, '/', '', '', ''])
+    if not parsed_url.scheme:
+        return urlunparse(["https", host, "/", "", "", ""])
     return host
 
 
